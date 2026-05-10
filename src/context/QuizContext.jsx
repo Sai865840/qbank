@@ -205,6 +205,11 @@ export function QuizProvider({ children }) {
     setQuestions(prev => prev.map(q => q.id === id ? { ...q, flagged: !q.flagged } : q));
   }, []);
 
+  const isFlagged = useCallback((id) => {
+    const q = questions.find(q => q.id === id);
+    return q?.flagged || false;
+  }, [questions]);
+
   const bulkAddQuestions = useCallback((newQuestions) => {
     const questionsWithIds = newQuestions.map(q => ({ ...q, id: `q-${Date.now()}-${Math.random()}`, flagged: false }));
     setQuestions(prev => [...prev, ...questionsWithIds]);
@@ -402,6 +407,7 @@ export function QuizProvider({ children }) {
     updateQuestion,
     deleteQuestion,
     toggleFlagQuestion,
+    isFlagged,
     bulkAddQuestions,
     addQuizSession,
     updateQuizSession,
