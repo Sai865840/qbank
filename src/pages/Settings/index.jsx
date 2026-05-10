@@ -17,6 +17,7 @@ export function Settings() {
   const [localSettings, setLocalSettings] = useState(userSettings);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importPreview, setImportPreview] = useState(null);
+  const [importData, setImportData] = useState(null);
   const [importError, setImportError] = useState('');
   const [showClearModal, setShowClearModal] = useState(false);
   const fileInputRef = useRef(null);
@@ -105,6 +106,7 @@ export function Settings() {
         };
 
         setImportPreview(preview);
+        setImportData(data);
         setImportError('');
         setShowImportModal(true);
       } catch (err) {
@@ -116,33 +118,27 @@ export function Settings() {
   };
 
   const handleImportConfirm = () => {
-    if (!importPreview) return;
+    if (!importData) return;
     
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target.result);
-        
-        if (data.subjects) localStorage.setItem('quizwix_subjects', JSON.stringify(data.subjects));
-        if (data.topics) localStorage.setItem('quizwix_topics', JSON.stringify(data.topics));
-        if (data.questions) localStorage.setItem('quizwix_questions', JSON.stringify(data.questions));
-        if (data.quizSessions) localStorage.setItem('quizwix_quizSessions', JSON.stringify(data.quizSessions));
-        if (data.userSettings) localStorage.setItem('quizwix_userSettings', JSON.stringify(data.userSettings));
-        if (data.spacedRevision) localStorage.setItem('quizwix_spacedRevision', JSON.stringify(data.spacedRevision));
-        if (data.wrongQuestions) localStorage.setItem('quizwix_wrongQuestions', JSON.stringify(data.wrongQuestions));
-        
-        setShowImportModal(false);
-        setImportPreview(null);
-        alert('Data imported successfully! Reloading...');
-        window.location.reload();
-      } catch (err) {
-        setImportError('Failed to import data. Please try again.');
-      }
-    };
-    reader.readAsText(file);
+    try {
+      const data = importData;
+      
+      if (data.subjects) localStorage.setItem('quizwix_subjects', JSON.stringify(data.subjects));
+      if (data.topics) localStorage.setItem('quizwix_topics', JSON.stringify(data.topics));
+      if (data.questions) localStorage.setItem('quizwix_questions', JSON.stringify(data.questions));
+      if (data.quizSessions) localStorage.setItem('quizwix_quizSessions', JSON.stringify(data.quizSessions));
+      if (data.userSettings) localStorage.setItem('quizwix_userSettings', JSON.stringify(data.userSettings));
+      if (data.spacedRevision) localStorage.setItem('quizwix_spacedRevision', JSON.stringify(data.spacedRevision));
+      if (data.wrongQuestions) localStorage.setItem('quizwix_wrongQuestions', JSON.stringify(data.wrongQuestions));
+      
+      setShowImportModal(false);
+      setImportPreview(null);
+      setImportData(null);
+      alert('Data imported successfully! Reloading...');
+      window.location.reload();
+    } catch (err) {
+      setImportError('Failed to import data. Please try again.');
+    }
   };
 
   const totalQuestions = questions.length;
@@ -377,7 +373,7 @@ export function Settings() {
 
       <Modal
         isOpen={showImportModal}
-        onClose={() => { setShowImportModal(false); setImportPreview(null); setImportError(''); }}
+        onClose={() => { setShowImportModal(false); setImportPreview(null); setImportData(null); setImportError(''); }}
         title="Import Data"
         size="small"
         footer={
