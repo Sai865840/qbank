@@ -9,7 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Send,
-  LogOut
+  LogOut,
+  Star
 } from 'lucide-react';
 import { Button, Modal } from '../../components/shared';
 import { useQuiz } from '../../context/QuizContext';
@@ -20,7 +21,7 @@ const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 export function Quiz() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { addQuizSession, userSettings, updateSpacedRevision, isInSpacedRevision, updateWrongQuestionStreak, isWrongQuestion } = useQuiz();
+  const { addQuizSession, userSettings, updateSpacedRevision, isInSpacedRevision, updateWrongQuestionStreak, isWrongQuestion, toggleFlagQuestion, isFlagged } = useQuiz();
 
   const [quizQuestions] = useState(() => location.state?.questions || []);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -256,9 +257,18 @@ export function Quiz() {
                 );
               })()}
             </div>
-            <h2 className={styles.questionText}>
-              {currentQuestion?.text}
-            </h2>
+            <div className={styles.questionTitleRow}>
+              <h2 className={styles.questionText}>
+                {currentQuestion?.text}
+              </h2>
+              <button 
+                className={`${styles.flagBtn} ${isFlagged(currentQuestion.id) ? styles.flagged : ''}`}
+                onClick={() => toggleFlagQuestion(currentQuestion.id)}
+                title={isFlagged(currentQuestion.id) ? "Remove flag" : "Flag question"}
+              >
+                <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
+              </button>
+            </div>
           </div>
 
           {/* Options Grid */}

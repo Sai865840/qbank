@@ -43,7 +43,7 @@ const formatTime = (seconds) => {
 export function Results() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
-  const { quizSessions, questions, addToSpacedRevision, isInSpacedRevision, addToWrongQuestions, isWrongQuestion } = useQuiz();
+  const { quizSessions, questions, addToSpacedRevision, isInSpacedRevision, addToWrongQuestions, isWrongQuestion, isFlagged } = useQuiz();
 
   const session = quizSessions.find(s => s.id === sessionId);
   const [reviewFilter, setReviewFilter] = useState('all');
@@ -92,6 +92,7 @@ export function Results() {
       displayLetter: userAnswer !== null ? OPTION_LETTERS[userAnswer] : null,
       isCorrect,
       isSkipped,
+      isFlagged: isFlagged(q.id),
       status: isSkipped ? 'skipped' : isCorrect ? 'correct' : 'incorrect',
     };
   });
@@ -101,6 +102,7 @@ export function Results() {
     if (reviewFilter === 'correct') return item.isCorrect;
     if (reviewFilter === 'incorrect') return !item.isSkipped && !item.isCorrect;
     if (reviewFilter === 'skipped') return item.isSkipped;
+    if (reviewFilter === 'flagged') return item.isFlagged;
     return true;
   });
 
@@ -213,6 +215,12 @@ export function Results() {
               onClick={() => setReviewFilter('skipped')}
             >
               Skipped ({reviewItems.filter(i => i.isSkipped).length})
+            </button>
+            <button
+              className={`${styles.filterTab} ${reviewFilter === 'flagged' ? styles.active : ''}`}
+              onClick={() => setReviewFilter('flagged')}
+            >
+              Flagged ({reviewItems.filter(i => i.isFlagged).length})
             </button>
           </div>
         </div>
