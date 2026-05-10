@@ -316,18 +316,23 @@
 
 .matrixGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  gap: 0.3rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .matrixItem {
   aspect-ratio: 1;
+  min-width: 28px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
   background: #fff;
   color: var(--color-muted);
