@@ -203,6 +203,10 @@
   transition: all 0.2s ease;
 }
 
+.filterSelect:not(:last-child) {
+  margin-bottom: 12px;
+}
+
 .filterSelect:focus {
   outline: none;
   border-color: var(--color-primary);

@@ -241,15 +241,12 @@ export function QuizProvider({ children }) {
     if (spacedRevision[questionId]) return false;
     
     const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextRevision = tomorrow.toISOString().split('T')[0];
     const todayStr = today.toISOString().split('T')[0];
     
     setSpacedRevision(prev => ({
       ...prev,
       [questionId]: {
-        nextRevision,
+        nextRevision: todayStr,
         interval: 1,
         easeFactor: SM2_DEFAULTS.initialEaseFactor,
         reviewCount: 0,
