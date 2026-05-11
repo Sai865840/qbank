@@ -92,8 +92,8 @@ export function Dashboard() {
       icon: Clock,
       color: '#8B5CF6',
       bg: 'rgba(139, 92, 246, 0.1)',
-      value: stats.totalTime > 0 ? formatTime(stats.totalTime) : '-',
-      label: 'Total Time',
+      value: quizSessions.length,
+      label: 'Quizzes Taken',
     },
   ];
 

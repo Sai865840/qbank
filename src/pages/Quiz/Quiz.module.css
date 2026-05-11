@@ -347,7 +347,7 @@
 
 .matrixGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(29px, 1fr));
   gap: 0.35rem;
   max-height: 200px;
   overflow-y: auto;
@@ -356,8 +356,8 @@
 
 .matrixItem {
   aspect-ratio: 1;
-  min-width: 34px;
-  min-height: 34px;
+  min-width: 29px;
+  min-height: 29px;
   display: flex;
   align-items: center;
   justify-content: center;
