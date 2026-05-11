@@ -320,33 +320,27 @@ export function QuizProvider({ children }) {
   }, []);
 
   const updateWrongQuestionStreak = useCallback((questionId, isCorrect) => {
-    const wrongData = wrongQuestions[questionId];
-    if (!wrongData) return;
+    setWrongQuestions(prev => {
+      const wrongData = prev[questionId];
+      if (!wrongData) return prev;
 
-    if (isCorrect) {
-      const newStreak = wrongData.streak + 1;
-      if (newStreak >= 5) {
-        removeFromWrongQuestions(questionId);
-        addToast('Removed from wrong questions!', 'success');
-      } else {
-        setWrongQuestions(prev => ({
-          ...prev,
-          [questionId]: {
-            ...prev[questionId],
-            streak: newStreak,
-          },
-        }));
+      const newStreak = isCorrect ? wrongData.streak + 1 : 0;
+
+      if (isCorrect && newStreak >= 5) {
+        const newWrong = { ...prev };
+        delete newWrong[questionId];
+        return newWrong;
       }
-    } else {
-      setWrongQuestions(prev => ({
+
+      return {
         ...prev,
         [questionId]: {
-          ...prev[questionId],
-          streak: 0,
+          ...wrongData,
+          streak: newStreak,
         },
-      }));
-    }
-  }, [wrongQuestions, removeFromWrongQuestions, addToast]);
+      };
+    });
+  }, []);
 
   const isWrongQuestion = useCallback((questionId) => {
     return !!wrongQuestions[questionId];
