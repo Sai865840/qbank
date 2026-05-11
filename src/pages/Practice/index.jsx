@@ -295,6 +295,7 @@ export function Practice() {
                 {scope === 'Single Topic' && selectedSubject && (
                   <select 
                     className={styles.filterSelect}
+                    style={{ marginTop: '16px' }}
                     value={selectedTopic}
                     onChange={(e) => setSelectedTopic(e.target.value)}
                   >

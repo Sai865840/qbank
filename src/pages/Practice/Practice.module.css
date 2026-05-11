@@ -204,7 +204,7 @@
 }
 
 .filterSelect:not(:last-child) {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .filterSelect:focus {
