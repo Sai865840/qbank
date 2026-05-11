@@ -283,13 +283,13 @@ export function Results() {
                     onClick={() => addToWrongQuestions(item.question.id)}
                   >
                     <AlertCircle size={14} />
-                    <span>Mark as Wrong Question</span>
+                    <span>Add to Wrong List</span>
                   </button>
                 )}
-                {(!item.isCorrect || item.isSkipped) && isWrongQuestion(item.question.id) && (
+                {isWrongQuestion(item.question.id) && (
                   <div className={`${styles.addedBadge} ${styles.wrongBadge}`}>
                     <AlertCircle size={12} />
-                    <span>Wrong Question</span>
+                    <span>In Wrong List</span>
                   </div>
                 )}
               </div>

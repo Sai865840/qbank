@@ -147,7 +147,8 @@ export function Quiz() {
     if (showFeedback && isPractice) return;
     
     const currentQ = quizQuestions[currentIndex];
-    const isCorrect = currentQ && optionIndex === currentQ.correct;
+    const originalIdx = shuffledOptions[currentIndex][optionIndex];
+    const isCorrect = currentQ && originalIdx === currentQ.correct;
     
     if (isDueMode && isInSpacedRevision(currentQ.id)) {
       updateSpacedRevision(currentQ.id, isCorrect);
