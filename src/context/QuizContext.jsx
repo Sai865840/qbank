@@ -142,11 +142,15 @@ export function QuizProvider({ children }) {
   }, [addToast]);
 
   const deleteSubject = useCallback((id) => {
+    const topicsToDelete = topics.filter(t => t.subjectId === id);
+    const topicIds = topicsToDelete.map(t => t.id);
     setSubjects(prev => prev.filter(s => s.id !== id));
     setTopics(prev => prev.filter(t => t.subjectId !== id));
-    setQuestions(prev => prev.filter(q => q.subjectId !== id));
+    setQuestions(prev => prev.filter(q => 
+      !topicIds.includes(q.topicId) && q.subjectId !== id
+    ));
     addToast('Subject deleted', 'success');
-  }, [addToast]);
+  }, [topics, addToast]);
 
   const addTopic = useCallback((topic) => {
     const newTopic = { ...topic, id: `topic-${Date.now()}` };
