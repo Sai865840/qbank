@@ -150,7 +150,7 @@ export function QuestionBank() {
   const navigate = useNavigate();
   const {
     subjects, topics, questions, quizSessions, addSubject, updateSubject, deleteSubject,
-    addTopic, updateTopic, deleteTopic, bulkAddQuestions, getTopicsBySubject, addToast,
+    addTopic, updateTopic, deleteTopic, deleteQuestion, bulkAddQuestions, getTopicsBySubject, addToast,
     getSpacedRevisionData, isInSpacedRevision, getWrongQuestionStreak, isWrongQuestion,
     spacedRevision, wrongQuestions,
   } = useQuiz();
@@ -163,7 +163,7 @@ export function QuestionBank() {
   const [subjectModal, setSubjectModal] = useState({ isOpen: false, subject: null });
   const [topicModal, setTopicModal] = useState({ isOpen: false, topic: null });
   const [bulkModal, setBulkModal] = useState(false);
-  const [deleteQuestion, setDeleteQuestion] = useState(null);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
   const [subjectToDelete, setSubjectToDelete] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
 
@@ -400,7 +400,7 @@ export function QuestionBank() {
                       </span>
                       <span className={styles.colActions}>
                         <button className={styles.iconBtn} onClick={() => navigate('/questions/add', { state: { question: q } })} title="Edit"><Edit2 size={14} /></button>
-                        <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => setDeleteQuestion(q)} title="Delete"><Trash2 size={14} /></button>
+                        <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => setQuestionToDelete(q)} title="Delete"><Trash2 size={14} /></button>
                       </span>
                     </div>
                   );
@@ -454,14 +454,14 @@ export function QuestionBank() {
       <BulkImportModal isOpen={bulkModal} onClose={() => setBulkModal(false)} onImport={handleBulkImport} addToast={addToast} />
       
       <Modal
-        isOpen={!!deleteQuestion}
-        onClose={() => setDeleteQuestion(null)}
+        isOpen={!!questionToDelete}
+        onClose={() => setQuestionToDelete(null)}
         title="Delete Question"
         size="small"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setDeleteQuestion(null)}>Cancel</Button>
-            <Button variant="danger" onClick={() => { deleteQuestion(deleteQuestion.id); setDeleteQuestion(null); }}>Delete</Button>
+            <Button variant="secondary" onClick={() => setQuestionToDelete(null)}>Cancel</Button>
+            <Button variant="danger" onClick={() => { deleteQuestion(questionToDelete.id); setQuestionToDelete(null); }}>Delete</Button>
           </>
         }
       >
@@ -470,9 +470,9 @@ export function QuestionBank() {
             <AlertTriangle size={20} />
           </div>
           <p>Delete this question?</p>
-          {deleteQuestion && (
+          {questionToDelete && (
             <div className={styles.confirmQuestion}>
-              "{deleteQuestion.text}"
+              "{questionToDelete.text}"
             </div>
           )}
         </div>
