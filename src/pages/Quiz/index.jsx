@@ -244,6 +244,13 @@ export function Quiz() {
           <div className={styles.questionCard}>
             <div className={styles.questionHeader}>
               <span className={styles.questionNumber}>Question {currentIndex + 1}</span>
+              <button 
+                className={`${styles.flagBtn} ${isFlagged(currentQuestion.id) ? styles.flagged : ''}`}
+                onClick={() => toggleFlagQuestion(currentQuestion.id)}
+                title={isFlagged(currentQuestion.id) ? "Remove flag" : "Flag question"}
+              >
+                <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
+              </button>
               {isPractice && showFeedback && (() => {
                 const originalIdx = currentAnswer !== null ? shuffledOptions[currentIndex][currentAnswer] : null;
                 const isCorrect = originalIdx === currentQuestion.correct;
@@ -258,18 +265,9 @@ export function Quiz() {
                 );
               })()}
             </div>
-            <div className={styles.questionTitleRow}>
-              <h2 className={styles.questionText}>
-                {currentQuestion?.text}
-              </h2>
-              <button 
-                className={`${styles.flagBtn} ${isFlagged(currentQuestion.id) ? styles.flagged : ''}`}
-                onClick={() => toggleFlagQuestion(currentQuestion.id)}
-                title={isFlagged(currentQuestion.id) ? "Remove flag" : "Flag question"}
-              >
-                <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
-              </button>
-            </div>
+            <h2 className={styles.questionText}>
+              {currentQuestion?.text}
+            </h2>
           </div>
 
           {/* Options Grid */}
