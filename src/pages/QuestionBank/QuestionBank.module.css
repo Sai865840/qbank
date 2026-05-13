@@ -566,7 +566,7 @@
 
 .questionListHeader {
   display: grid;
-  grid-template-columns: 50px 1fr 160px 150px 60px;
+  grid-template-columns: 40px 50px 1fr 160px 150px 60px;
   gap: 12px;
   padding: 12px 16px;
   background: var(--color-background);
@@ -580,7 +580,7 @@
 
 .questionRow {
   display: grid;
-  grid-template-columns: 50px 1fr 160px 150px 60px;
+  grid-template-columns: 40px 50px 1fr 160px 150px 60px;
   gap: 12px;
   padding: 14px 16px;
   align-items: center;
@@ -594,6 +594,23 @@
 
 .questionRow:hover {
   background: var(--color-background);
+}
+
+.selectedRow {
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.colCheckbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
 }
 
 .colNum {

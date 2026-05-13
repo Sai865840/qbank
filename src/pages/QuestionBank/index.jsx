@@ -166,6 +166,8 @@ export function QuestionBank() {
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const [subjectToDelete, setSubjectToDelete] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
   const openSubjectModal = (subject = null) => setSubjectModal({ isOpen: true, subject });
   const openTopicModal = (topic = null) => setTopicModal({ isOpen: true, topic });
@@ -178,15 +180,17 @@ export function QuestionBank() {
     return true;
   });
 
-  const filteredQuestions = questions.filter(q => {
-    if (search && !q.text.toLowerCase().includes(search.toLowerCase())) return false;
-    if (filterSubject) {
-      const topic = topics.find(t => t.id === q.topicId);
-      if (topic?.subjectId !== filterSubject) return false;
-    }
-    if (filterTopic && q.topicId !== filterTopic) return false;
-    return true;
-  });
+  const filteredQuestions = questions
+    .filter(q => {
+      if (search && !q.text.toLowerCase().includes(search.toLowerCase())) return false;
+      if (filterSubject) {
+        const topic = topics.find(t => t.id === q.topicId);
+        if (topic?.subjectId !== filterSubject) return false;
+      }
+      if (filterTopic && q.topicId !== filterTopic) return false;
+      return true;
+    })
+    .reverse();
 
   const totalPages = Math.ceil(filteredQuestions.length / PAGE_SIZE);
   const paginatedQuestions = filteredQuestions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -203,6 +207,29 @@ export function QuestionBank() {
 
   const handleBulkImport = (questionsList) => {
     bulkAddQuestions(questionsList);
+  };
+
+  const toggleQuestionSelection = (questionId) => {
+    setSelectedQuestions(prev => 
+      prev.includes(questionId) 
+        ? prev.filter(id => id !== questionId)
+        : [...prev, questionId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedQuestions.length === paginatedQuestions.length) {
+      setSelectedQuestions([]);
+    } else {
+      setSelectedQuestions(paginatedQuestions.map(q => q.id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    selectedQuestions.forEach(id => deleteQuestion(id));
+    setSelectedQuestions([]);
+    setBulkDeleteConfirm(false);
+    addToast(`${selectedQuestions.length} questions deleted`, 'success');
   };
 
   const getSubjectName = (subjectId) => subjects.find(s => s.id === subjectId)?.name || '';
@@ -358,12 +385,24 @@ export function QuestionBank() {
                 {topics.filter(t => t.subjectId === filterSubject).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             )}
+            {selectedQuestions.length > 0 && (
+              <Button variant="danger" size="small" onClick={() => setBulkDeleteConfirm(true)}>
+                <Trash2 size={14} /> Delete ({selectedQuestions.length})
+              </Button>
+            )}
           </div>
           
           {paginatedQuestions.length > 0 ? (
             <>
               <div className={styles.questionList}>
                 <div className={styles.questionListHeader}>
+                  <span className={styles.colCheckbox}>
+                    <input 
+                      type="checkbox" 
+                      checked={paginatedQuestions.length > 0 && selectedQuestions.length === paginatedQuestions.length}
+                      onChange={toggleSelectAll}
+                    />
+                  </span>
                   <span className={styles.colNum}>#</span>
                   <span className={styles.colQuestion}>Question</span>
                   <span className={styles.colMeta}>Subject / Topic</span>
@@ -377,7 +416,14 @@ export function QuestionBank() {
                   const isWrong = isWrongQuestion(q.id);
                   
                   return (
-                    <div key={q.id} className={styles.questionRow}>
+                    <div key={q.id} className={`${styles.questionRow} ${selectedQuestions.includes(q.id) ? styles.selectedRow : ''}`}>
+                      <span className={styles.colCheckbox}>
+                        <input 
+                          type="checkbox" 
+                          checked={selectedQuestions.includes(q.id)}
+                          onChange={() => toggleQuestionSelection(q.id)}
+                        />
+                      </span>
                       <span className={styles.colNum}>{(page - 1) * PAGE_SIZE + idx + 1}</span>
                       <span className={styles.colQuestion}>{q.text}</span>
                       <span className={styles.colMeta}>
@@ -475,6 +521,27 @@ export function QuestionBank() {
               "{questionToDelete.text}"
             </div>
           )}
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={bulkDeleteConfirm}
+        onClose={() => setBulkDeleteConfirm(false)}
+        title="Delete Questions"
+        size="small"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setBulkDeleteConfirm(false)}>Cancel</Button>
+            <Button variant="danger" onClick={handleBulkDelete}>Delete {selectedQuestions.length} Questions</Button>
+          </>
+        }
+      >
+        <div className={styles.confirmContent}>
+          <div className={styles.confirmIcon}>
+            <AlertTriangle size={20} />
+          </div>
+          <p>Delete {selectedQuestions.length} questions?</p>
+          <p className={styles.confirmWarning}>This action cannot be undone.</p>
         </div>
       </Modal>
 
