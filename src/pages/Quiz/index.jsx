@@ -273,22 +273,24 @@ export function Quiz() {
           <div className={styles.questionCard}>
             <div className={styles.questionHeader}>
               <span className={styles.questionNumber}>Question {currentIndex + 1}</span>
-              <button 
-                className={`${styles.flagBtn} ${isFlagged(currentQuestion.id) ? styles.flagged : ''}`}
-                onClick={() => toggleFlagQuestion(currentQuestion.id)}
-                title={isFlagged(currentQuestion.id) ? "Remove flag" : "Flag question"}
-              >
-                <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
-              </button>
-              {!isPractice && (
+              <div className={styles.actionButtons}>
                 <button 
-                  className={styles.deleteBtn}
-                  onClick={() => setShowDeleteModal(true)}
-                  title="Delete question from bank"
+                  className={`${styles.flagBtn} ${isFlagged(currentQuestion.id) ? styles.flagged : ''}`}
+                  onClick={() => toggleFlagQuestion(currentQuestion.id)}
+                  title={isFlagged(currentQuestion.id) ? "Remove flag" : "Flag question"}
                 >
-                  <Trash2 size={18} />
+                  <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
                 </button>
-              )}
+                {!isPractice && (
+                  <button 
+                    className={styles.deleteBtn}
+                    onClick={() => setShowDeleteModal(true)}
+                    title="Delete question from bank"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
               {isPractice && showFeedback && (() => {
                 const originalIdx = currentAnswer !== null ? shuffledOptions[currentIndex][currentAnswer] : null;
                 const isCorrect = originalIdx === currentQuestion.correct;

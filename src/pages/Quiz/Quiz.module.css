@@ -164,6 +164,11 @@
   margin-bottom: 0.75rem;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 2px;
+}
+
 .questionNumber {
   font-size: 0.75rem;
   font-weight: 800;
