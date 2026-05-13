@@ -391,7 +391,7 @@ export function Settings() {
         )}
         {importPreview && (
           <div className={styles.importPreview}>
-            <p className={styles.importTitle}>The following data will be imported:</p>
+            <p className={styles.importTitle}>Data to import:</p>
             <div className={styles.importStats}>
               <div className={styles.importStat}>
                 <span className={styles.importStatValue}>{importPreview.subjects}</span>
@@ -418,7 +418,7 @@ export function Settings() {
                 <span className={styles.importStatLabel}>Wrong Q</span>
               </div>
             </div>
-            <p className={styles.importWarning}>This will replace all existing data. This action cannot be undone.</p>
+            <p className={styles.importWarning}>Will replace all existing data.</p>
           </div>
         )}
       </Modal>
@@ -440,15 +440,14 @@ export function Settings() {
       >
         <div className={styles.clearContent}>
           <div className={styles.clearIcon}>
-            <AlertTriangle size={20} />
+            <AlertTriangle size={18} />
           </div>
-          <p>Delete ALL data?</p>
+          <p>Delete all data?</p>
           <ul className={styles.clearList}>
-            <li>{subjects.length} subjects · {topics.length} topics</li>
-            <li>{questions.length} questions · {quizSessions.length} sessions</li>
-            <li>{Object.keys(spacedRevision || {}).length} revision · {Object.keys(wrongQuestions || {}).length} wrong</li>
+            <li>{subjects.length} subj · {topics.length} topics</li>
+            <li>{questions.length} q · {quizSessions.length} sessions</li>
           </ul>
-          <p className={styles.clearDanger}>Cannot be undone!</p>
+          <p className={styles.clearDanger}>Cannot undo!</p>
         </div>
       </Modal>
     </div>

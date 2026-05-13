@@ -213,50 +213,50 @@
 }
 
 .importPreview {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .importTitle {
-  margin: 0 0 16px 0;
-  font-size: 0.9375rem;
+  margin: 0 0 10px 0;
+  font-size: 0.8125rem;
   color: var(--color-text);
 }
 
 .importStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .importStat {
   text-align: center;
-  padding: 12px;
+  padding: 8px;
   background: var(--color-background);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
 }
 
 .importStatValue {
   display: block;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text);
 }
 
 .importStatLabel {
   display: block;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   color: var(--color-muted);
   text-transform: uppercase;
   margin-top: 2px;
 }
 
 .importWarning {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--color-warning);
-  padding: 12px;
+  padding: 8px;
   background: rgba(245, 158, 11, 0.1);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   margin: 0;
 }
 
@@ -269,31 +269,31 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(239, 68, 68, 0.1);
   color: var(--color-error);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .clearContent p {
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .clearWarning {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--color-muted);
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
 }
 
 .clearList {
   text-align: left;
-  padding-left: 16px;
-  margin: 6px 0;
-  font-size: 0.75rem;
+  padding-left: 12px;
+  margin: 4px 0;
+  font-size: 0.6875rem;
   color: var(--color-text);
 }
 

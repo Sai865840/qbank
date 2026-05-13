@@ -190,7 +190,7 @@ export function Practice() {
         setQuestionCount(Math.max(1, available));
       }
     }
-  }, [selectedMode, questionCount, getAvailableCount, selectedMode]);
+  }, [selectedMode, questionCount, getAvailableCount, scope, selectedSubject, selectedTopic, selectedTopics]);
 
   const startQuiz = (mode) => {
     let quizQuestions = getModeQuestions(mode);
@@ -275,7 +275,7 @@ export function Practice() {
                 <button
                   key={s}
                   className={`${styles.scopeChip} ${scope === s ? styles.active : ''}`}
-                  onClick={() => { setScope(s); setSelectedMode(null); }}
+                  onClick={() => setScope(s)}
                 >
                   {s}
                 </button>

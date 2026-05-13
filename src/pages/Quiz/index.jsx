@@ -443,10 +443,10 @@ export function Quiz() {
       >
         <div className={styles.confirmContent}>
           <div className={styles.confirmIcon}>
-            <AlertTriangle size={32} />
+            <AlertTriangle size={24} />
           </div>
           <h3 className={styles.confirmTitle}>Exit Quiz?</h3>
-          <p className={styles.confirmText}>Are you sure you want to exit? Your current progress will not be saved.</p>
+          <p className={styles.confirmText}>Progress will be lost.</p>
           
           <div className={styles.modalStats}>
             <div className={styles.modalStatCard}>
@@ -455,16 +455,16 @@ export function Quiz() {
             </div>
             <div className={styles.modalStatCard}>
               <span className={styles.modalStatVal} style={{ color: 'var(--color-muted)' }}>{leftCount}</span>
-              <span className={styles.modalStatLab}>Remaining</span>
+              <span className={styles.modalStatLab}>Left</span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             <Button variant="secondary" onClick={() => setShowQuitModal(false)} fullWidth>
               Continue
             </Button>
             <Button variant="danger" onClick={() => navigate('/practice')} fullWidth>
-              Exit Anyway
+              Exit
             </Button>
           </div>
         </div>
@@ -478,23 +478,23 @@ export function Quiz() {
       >
         <div className={styles.confirmContent}>
           <div className={styles.confirmIcon} style={{ background: 'rgba(37, 99, 235, 0.1)', color: 'var(--color-primary)' }}>
-            <Check size={32} />
+            <Check size={24} />
           </div>
           <h3 className={styles.confirmTitle}>Finish Quiz</h3>
-          <p className={styles.confirmText}>Ready to see your results? You've answered {answeredCount} out of {quizQuestions.length} questions.</p>
+          <p className={styles.confirmText}>{answeredCount}/{quizQuestions.length} answered.</p>
           
           {leftCount > 0 && (
-            <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem', color: '#854d0e', fontSize: '0.85rem' }}>
-              Warning: {leftCount} questions are still unanswered.
+            <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '0.5rem', borderRadius: '6px', marginBottom: '0.75rem', color: '#854d0e', fontSize: '0.75rem' }}>
+              {leftCount} unanswered
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             <Button variant="secondary" onClick={() => setShowSubmitModal(false)} fullWidth>
-              Go Back
+              Back
             </Button>
             <Button onClick={handleSubmit} fullWidth>
-              Submit Now
+              Submit
             </Button>
           </div>
         </div>
@@ -508,12 +508,12 @@ export function Quiz() {
       >
         <div className={styles.confirmContent}>
           <div className={styles.confirmIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-error)' }}>
-            <Trash2 size={32} />
+            <Trash2 size={24} />
           </div>
-          <h3 className={styles.confirmTitle}>Delete Question?</h3>
-          <p className={styles.confirmText}>This will permanently remove the question from your question bank. This action cannot be undone.</p>
+          <h3 className={styles.confirmTitle}>Delete?</h3>
+          <p className={styles.confirmText}>Remove from question bank permanently.</p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)} fullWidth>
               Cancel
             </Button>
