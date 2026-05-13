@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Send,
   LogOut,
-  Star
+  Star,
+  Trash2
 } from 'lucide-react';
 import { Button, Modal } from '../../components/shared';
 import { useQuiz } from '../../context/QuizContext';
@@ -21,9 +22,9 @@ const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 export function Quiz() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { addQuizSession, userSettings, updateSpacedRevision, isInSpacedRevision, updateWrongQuestionStreak, isWrongQuestion, toggleFlagQuestion, isFlagged } = useQuiz();
+  const { addQuizSession, userSettings, updateSpacedRevision, isInSpacedRevision, updateWrongQuestionStreak, isWrongQuestion, toggleFlagQuestion, isFlagged, deleteQuestion } = useQuiz();
 
-  const [quizQuestions] = useState(() => location.state?.questions || []);
+  const [quizQuestions, setQuizQuestions] = useState(() => location.state?.questions || []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState(() => 
     location.state?.session?.answers || (location.state?.questions || []).map(() => null)
@@ -38,7 +39,7 @@ export function Quiz() {
     return shuffled;
   };
   
-  const [shuffledOptions] = useState(() => {
+  const [shuffledOptions, setShuffledOptions] = useState(() => {
     const saved = location.state?.session?.shuffledOptions;
     if (saved) return saved;
     return quizQuestions.map((_, idx) => shuffleArray(Array.from({ length: quizQuestions[idx]?.options?.length || 0 }, (_, i) => i)));
@@ -59,6 +60,7 @@ export function Quiz() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const timerRef = useRef(null);
   const submitFnRef = useRef(null);
@@ -141,6 +143,33 @@ export function Quiz() {
       setShowFeedback(false);
       setViewedQuestions(prev => ({ ...prev, [prevIdx]: true }));
     }
+  };
+
+  const handleDeleteQuestion = () => {
+    if (currentQuestion?.id) {
+      deleteQuestion(currentQuestion.id);
+      const newQuizQuestions = quizQuestions.filter((_, idx) => idx !== currentIndex);
+      const newAnswers = answers.filter((_, idx) => idx !== currentIndex);
+      const newShuffledOptions = shuffledOptions.filter((_, idx) => idx !== currentIndex);
+      const newViewedQuestions = {};
+      
+      newQuizQuestions.forEach((_, idx) => {
+        newViewedQuestions[idx] = viewedQuestions[idx] || viewedQuestions[idx + 1] || false;
+      });
+      
+      if (newQuizQuestions.length === 0) {
+        navigate('/practice');
+      } else {
+        setQuizQuestions(newQuizQuestions);
+        setAnswers(newAnswers);
+        setShuffledOptions(newShuffledOptions);
+        setViewedQuestions(newViewedQuestions);
+        if (currentIndex >= newQuizQuestions.length) {
+          setCurrentIndex(Math.max(0, newQuizQuestions.length - 1));
+        }
+      }
+    }
+    setShowDeleteModal(false);
   };
 
   const handleAnswerSelect = useCallback((optionIndex) => {
@@ -251,6 +280,15 @@ export function Quiz() {
               >
                 <Star size={18} fill={isFlagged(currentQuestion.id) ? "currentColor" : "none"} />
               </button>
+              {!isPractice && (
+                <button 
+                  className={styles.deleteBtn}
+                  onClick={() => setShowDeleteModal(true)}
+                  title="Delete question from bank"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
               {isPractice && showFeedback && (() => {
                 const originalIdx = currentAnswer !== null ? shuffledOptions[currentIndex][currentAnswer] : null;
                 const isCorrect = originalIdx === currentQuestion.correct;
@@ -455,6 +493,30 @@ export function Quiz() {
             </Button>
             <Button onClick={handleSubmit} fullWidth>
               Submit Now
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        showCloseButton={false}
+        size="small"
+      >
+        <div className={styles.confirmContent}>
+          <div className={styles.confirmIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-error)' }}>
+            <Trash2 size={32} />
+          </div>
+          <h3 className={styles.confirmTitle}>Delete Question?</h3>
+          <p className={styles.confirmText}>This will permanently remove the question from your question bank. This action cannot be undone.</p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <Button variant="secondary" onClick={() => setShowDeleteModal(false)} fullWidth>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleDeleteQuestion} fullWidth>
+              Delete
             </Button>
           </div>
         </div>
