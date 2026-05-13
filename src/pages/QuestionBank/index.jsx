@@ -174,11 +174,13 @@ export function QuestionBank() {
 
   const filteredSubjects = subjects.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
 
-  const filteredTopics = topics.filter(t => {
-    if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
-    if (filterSubject && t.subjectId !== filterSubject) return false;
-    return true;
-  });
+  const filteredTopics = topics
+    .filter(t => {
+      if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (filterSubject && t.subjectId !== filterSubject) return false;
+      return true;
+    })
+    .sort((a, b) => b.id.localeCompare(a.id));
 
   const filteredQuestions = questions
     .filter(q => {
