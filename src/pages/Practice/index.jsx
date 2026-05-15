@@ -94,6 +94,7 @@ export function Practice() {
   const [selectedMode, setSelectedMode] = useState(null);
 
   const getFilteredQuestions = () => {
+    if (!questions || !Array.isArray(questions)) return [];
     if (scope === 'All Subjects') return questions;
     if (scope === 'Selected Subjects' && selectedSubject) {
       const topicIds = topics.filter(t => t.subjectId === selectedSubject).map(t => t.id);
@@ -109,7 +110,9 @@ export function Practice() {
   };
 
   const getModeQuestions = (mode) => {
-    let filtered = getFilteredQuestions();
+    if (!mode) return [];
+    const filtered = getFilteredQuestions();
+    if (!filtered || filtered.length === 0) return [];
     
     switch (mode) {
       case 'smart': {
@@ -196,21 +199,23 @@ export function Practice() {
   const isModeAvailable = (mode) => MODES.find(m => m.id === mode)?.availableFor.includes(scope);
 
   useEffect(() => {
-    if (selectedMode) {
+    if (selectedMode && selectedMode !== 'endless') {
       const available = getAvailableCount(selectedMode);
       if (questionCount > available) {
         setQuestionCount(Math.max(1, available));
       }
     }
-  }, [selectedMode, questionCount, getAvailableCount, scope, selectedSubject, selectedTopic, selectedTopics]);
+  }, [selectedMode, questionCount, scope, selectedSubject, selectedTopic, selectedTopics]);
 
   const startQuiz = (mode) => {
     let quizQuestions = getModeQuestions(mode);
     if (quizQuestions.length === 0) return;
 
-    const count = ['due', 'unseen', 'wrong'].includes(mode) 
-      ? Math.min(quizQuestions.length, questionCount) 
-      : Math.min(quizQuestions.length, questionCount);
+    const count = mode === 'endless' 
+      ? quizQuestions.length 
+      : (['due', 'unseen', 'wrong'].includes(mode) 
+        ? Math.min(quizQuestions.length, questionCount) 
+        : Math.min(quizQuestions.length, questionCount));
     quizQuestions = quizQuestions.slice(0, count);
 
     const session = {
