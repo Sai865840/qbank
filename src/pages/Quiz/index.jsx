@@ -69,6 +69,8 @@ export function Quiz() {
   
   const timerRef = useRef(null);
   const submitFnRef = useRef(null);
+  const streakRef = useRef(0);
+  const bestStreakRef = useRef(0);
 
   const session = location.state?.session;
   const mode = location.state?.mode || 'practice';
@@ -252,10 +254,11 @@ export function Quiz() {
     if (isEndless) {
       setShowFeedback(true);
       if (isCorrect) {
-        const newStreak = streak + 1;
-        setStreak(newStreak);
-        if (newStreak > bestStreak) {
-          setBestStreak(newStreak);
+        streakRef.current += 1;
+        setStreak(streakRef.current);
+        if (streakRef.current > bestStreakRef.current) {
+          bestStreakRef.current = streakRef.current;
+          setBestStreak(bestStreakRef.current);
         }
       } else {
         setTimeout(() => {
@@ -275,7 +278,7 @@ export function Quiz() {
         handleNext();
       }, 300);
     }
-  }, [currentIndex, showFeedback, isPractice, isEndless, handleNext, isDueMode, quizQuestions, isInSpacedRevision, updateSpacedRevision, isWrongQuestion, updateWrongQuestionStreak, streak, bestStreak]);
+  }, [currentIndex, showFeedback, isPractice, isEndless, handleNext, isDueMode, quizQuestions, isInSpacedRevision, updateSpacedRevision, isWrongQuestion, updateWrongQuestionStreak]);
 
   const currentQuestion = quizQuestions[currentIndex];
   const currentAnswer = answers[currentIndex];
