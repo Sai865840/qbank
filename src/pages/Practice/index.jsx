@@ -1,16 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
-  Target,
-  Zap,
   Eye,
   Shuffle,
   BrainCircuit,
   Clock,
   XCircle,
   BookOpen,
-  Settings2,
   Layers,
   Hash,
   Flame,
@@ -195,17 +192,20 @@ export function Practice() {
     }
   };
 
-  const getAvailableCount = (mode) => getModeQuestions(mode).length;
-  const isModeAvailable = (mode) => MODES.find(m => m.id === mode)?.availableFor.includes(scope);
+  const getAvailableCount = (mode) => {
+    if (!mode) return 0;
+    const questions = getModeQuestions(mode);
+    return questions ? questions.length : 0;
+  };
 
   useEffect(() => {
     if (selectedMode && selectedMode !== 'endless') {
       const available = getAvailableCount(selectedMode);
-      if (questionCount > available) {
+      if (available > 0 && questionCount > available) {
         setQuestionCount(Math.max(1, available));
       }
     }
-  }, [selectedMode, questionCount, scope, selectedSubject, selectedTopic, selectedTopics]);
+  }, [selectedMode]);
 
   const startQuiz = (mode) => {
     let quizQuestions = getModeQuestions(mode);

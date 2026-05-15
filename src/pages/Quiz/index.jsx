@@ -160,16 +160,6 @@ export function Quiz() {
     }
   }, [gameOver, session, quizQuestions, answers, shuffledOptions, isTimed, timeLeft, userSettings.timerDefault, addQuizSession, navigate, bestStreak]);
 
-  // Endless mode - no more questions
-  useEffect(() => {
-    if (isEndless && currentIndex >= quizQuestions.length - 1 && answeredCount > 0 && !gameOver) {
-      setNoMoreQuestions(true);
-      setTimeout(() => {
-        setGameOver(true);
-      }, 500);
-    }
-  }, [isEndless, currentIndex, quizQuestions.length, answeredCount, gameOver]);
-
   const handleNext = useCallback(() => {
     if (isEndless) {
       if (currentIndex < quizQuestions.length - 1) {
