@@ -32,6 +32,7 @@ export function Quiz() {
   );
   
   const shuffleArray = (arr) => {
+    if (!arr || arr.length <= 1) return arr;
     const shuffled = [...arr];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -250,6 +251,9 @@ export function Quiz() {
           bestStreakRef.current = streakRef.current;
           setBestStreak(bestStreakRef.current);
         }
+        setTimeout(() => {
+          handleNext();
+        }, 400);
       } else {
         setTimeout(() => {
           setGameOver(true);
