@@ -12,6 +12,8 @@ import {
   HelpCircle,
   Calendar,
   Repeat,
+  Flame,
+  Trophy,
 } from 'lucide-react';
 import { Card, Button } from '../../components/shared';
 import { useQuiz } from '../../context/QuizContext';
@@ -49,6 +51,9 @@ export function Results() {
   const [reviewFilter, setReviewFilter] = useState('all');
 
   const isDueMode = session?.mode === 'due';
+  const isEndless = session?.mode === 'endless';
+  const isGameOver = session?.gameOver === true;
+  const bestStreak = session?.bestStreak || 0;
   const canAddToSpacedRevision = !isDueMode;
 
   if (!session) {
@@ -113,9 +118,16 @@ export function Results() {
           <Button variant="ghost" size="small" onClick={() => navigate('/practice')}>
             <ArrowLeft size={18} /> Back
           </Button>
-          <span className={styles.modeBadge}>
-            {session.mode?.charAt(0).toUpperCase() + session.mode?.slice(1)} Mode
-          </span>
+          {isEndless && isGameOver ? (
+            <span className={styles.modeBadge} style={{ background: 'rgba(220, 38, 38, 0.1)', color: '#DC2626' }}>
+              <Flame size={14} style={{ marginRight: 4 }} />
+              Game Over
+            </span>
+          ) : (
+            <span className={styles.modeBadge}>
+              {session.mode?.charAt(0).toUpperCase() + session.mode?.slice(1)} Mode
+            </span>
+          )}
         </div>
         <div className={styles.actions}>
           <Button variant="secondary" onClick={() => navigate('/practice')}>
@@ -125,67 +137,126 @@ export function Results() {
       </header>
 
       <div className={styles.scoreSection}>
-        <Card className={styles.scoreCard}>
-          <div className={styles.scoreRing}>
-            <svg className={styles.scoreRingSvg}>
-              <circle
-                className={styles.scoreRingBg}
-                cx="45"
-                cy="45"
-                r="40"
-              />
-              <circle
-                className={styles.scoreRingProgress}
-                cx="45"
-                cy="45"
-                r="40"
-                stroke={scoreColor}
-                strokeDasharray={2 * Math.PI * 40}
-                strokeDashoffset={(1 - percent / 100) * (2 * Math.PI * 40)}
-              />
-            </svg>
-            <div className={styles.scoreValue}>
-              <div className={styles.scorePercent}>{percent}%</div>
-              <div className={styles.scoreLabel}>Score</div>
-            </div>
-          </div>
-          <div className={styles.scoreTextContent}>
-            <div className={styles.scoreMessage}>{scoreMessage}</div>
-            <div className={styles.scoreSubtext}>{scoreSubtext}</div>
-          </div>
-        </Card>
+        {isEndless && isGameOver ? (
+          <>
+            <Card className={styles.scoreCard} style={{ border: '2px solid #DC2626' }}>
+              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <Flame size={48} style={{ color: '#DC2626', marginBottom: '0.5rem' }} />
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#DC2626', marginBottom: '0.25rem' }}>
+                  Game Over!
+                </div>
+                <div style={{ color: 'var(--color-muted)', fontSize: '0.875rem' }}>
+                  You got one wrong and the challenge ended.
+                </div>
+              </div>
+            </Card>
 
-        <Card>
-          <div className={styles.statsGrid}>
-            <div className={styles.statItem}>
-              <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
-                <Target size={18} style={{ color: '#10B981' }} />
+            <Card>
+              <div className={styles.statsGrid}>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(220, 38, 38, 0.1)' }}>
+                    <Flame size={18} style={{ color: '#DC2626' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{bestStreak}</div>
+                    <div className={styles.statLabel}>Best Streak</div>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                    <Target size={18} style={{ color: '#10B981' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{score}/{total}</div>
+                    <div className={styles.statLabel}>Correct</div>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(139, 92, 246, 0.1)' }}>
+                    <Trophy size={18} style={{ color: '#8B5CF6' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{percent}%</div>
+                    <div className={styles.statLabel}>Accuracy</div>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.1)' }}>
+                    <Clock size={18} style={{ color: '#F59E0B' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{formatTime(session.timeTaken)}</div>
+                    <div className={styles.statLabel}>Time</div>
+                  </div>
+                </div>
               </div>
-              <div className={styles.statInfo}>
-                <div className={styles.statValue}>{score}/{total}</div>
-                <div className={styles.statLabel}>Correct</div>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className={styles.scoreCard}>
+              <div className={styles.scoreRing}>
+                <svg className={styles.scoreRingSvg}>
+                  <circle
+                    className={styles.scoreRingBg}
+                    cx="45"
+                    cy="45"
+                    r="40"
+                  />
+                  <circle
+                    className={styles.scoreRingProgress}
+                    cx="45"
+                    cy="45"
+                    r="40"
+                    stroke={scoreColor}
+                    strokeDasharray={2 * Math.PI * 40}
+                    strokeDashoffset={(1 - percent / 100) * (2 * Math.PI * 40)}
+                  />
+                </svg>
+                <div className={styles.scoreValue}>
+                  <div className={styles.scorePercent}>{percent}%</div>
+                  <div className={styles.scoreLabel}>Score</div>
+                </div>
               </div>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.1)' }}>
-                <Clock size={18} style={{ color: '#F59E0B' }} />
+              <div className={styles.scoreTextContent}>
+                <div className={styles.scoreMessage}>{scoreMessage}</div>
+                <div className={styles.scoreSubtext}>{scoreSubtext}</div>
               </div>
-              <div className={styles.statInfo}>
-                <div className={styles.statValue}>{formatTime(session.timeTaken)}</div>
-                <div className={styles.statLabel}>Time</div>
+            </Card>
+
+            <Card>
+              <div className={styles.statsGrid}>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                    <Target size={18} style={{ color: '#10B981' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{score}/{total}</div>
+                    <div className={styles.statLabel}>Correct</div>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.1)' }}>
+                    <Clock size={18} style={{ color: '#F59E0B' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue}>{formatTime(session.timeTaken)}</div>
+                    <div className={styles.statLabel}>Time</div>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statIcon} style={{ background: 'rgba(37, 99, 235, 0.1)' }}>
+                    <Award size={18} style={{ color: '#2563EB' }} />
+                  </div>
+                  <div className={styles.statInfo}>
+                    <div className={styles.statValue} style={{ fontSize: '0.85rem' }}>{session.subject}</div>
+                    <div className={styles.statLabel}>Subject</div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statIcon} style={{ background: 'rgba(37, 99, 235, 0.1)' }}>
-                <Award size={18} style={{ color: '#2563EB' }} />
-              </div>
-              <div className={styles.statInfo}>
-                <div className={styles.statValue} style={{ fontSize: '0.85rem' }}>{session.subject}</div>
-                <div className={styles.statLabel}>Subject</div>
-              </div>
-            </div>
-          </div>
-        </Card>
+            </Card>
+          </>
+        )}
       </div>
 
       <div className={styles.reviewSection}>

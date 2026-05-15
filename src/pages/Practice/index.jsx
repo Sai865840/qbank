@@ -13,6 +13,7 @@ import {
   Settings2,
   Layers,
   Hash,
+  Flame,
 } from 'lucide-react';
 import { Card, Button } from '../../components/shared';
 import { useQuiz } from '../../context/QuizContext';
@@ -62,6 +63,15 @@ const MODES = [
     icon: Shuffle,
     color: '#2563EB',
     bg: 'rgba(37, 99, 235, 0.1)',
+    availableFor: ['All Subjects', 'Selected Subjects', 'Single Topic', 'Multiple Topics'],
+  },
+  {
+    id: 'endless',
+    name: 'Endless Challenge',
+    description: 'Keep going until you get one wrong!',
+    icon: Flame,
+    color: '#DC2626',
+    bg: 'rgba(220, 38, 38, 0.1)',
     availableFor: ['All Subjects', 'Selected Subjects', 'Single Topic', 'Multiple Topics'],
   },
 ];
@@ -174,6 +184,8 @@ export function Practice() {
         });
       }
       case 'quick':
+        return [...filtered].sort(() => Math.random() - 0.5);
+      case 'endless':
         return [...filtered].sort(() => Math.random() - 0.5);
       default:
         return filtered;
@@ -329,30 +341,49 @@ export function Practice() {
             )}
           </section>
 
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionIcon}><Hash size={18} /></div>
-              <h2 className={styles.sectionTitle}>Question Count</h2>
-            </div>
-            <div className={styles.sliderContainer}>
-              <input
-                type="range"
-                className={styles.slider}
-                min={1}
-                max={selectedMode ? Math.max(1, getAvailableCount(selectedMode)) : Math.max(1, getFilteredQuestions().length)}
-                value={questionCount}
-                onChange={(e) => setQuestionCount(parseInt(e.target.value))}
-              />
-              <div className={styles.sliderValue}>
-                <span className={styles.sliderNumber}>{questionCount}</span>
-                <span className={styles.sliderLabel}>questions</span>
+          {selectedMode !== 'endless' && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon}><Hash size={18} /></div>
+                <h2 className={styles.sectionTitle}>Question Count</h2>
               </div>
-            </div>
-            <div className={styles.availability}>
-              <span className={styles.availLabel}>Available:</span>
-              <span className={styles.availCount}>{selectedMode ? getAvailableCount(selectedMode) : getFilteredQuestions().length} questions</span>
-            </div>
-          </section>
+              <div className={styles.sliderContainer}>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min={1}
+                  max={selectedMode ? Math.max(1, getAvailableCount(selectedMode)) : Math.max(1, getFilteredQuestions().length)}
+                  value={questionCount}
+                  onChange={(e) => setQuestionCount(parseInt(e.target.value))}
+                />
+                <div className={styles.sliderValue}>
+                  <span className={styles.sliderNumber}>{questionCount}</span>
+                  <span className={styles.sliderLabel}>questions</span>
+                </div>
+              </div>
+              <div className={styles.availability}>
+                <span className={styles.availLabel}>Available:</span>
+                <span className={styles.availCount}>{selectedMode ? getAvailableCount(selectedMode) : getFilteredQuestions().length} questions</span>
+              </div>
+            </section>
+          )}
+          {selectedMode === 'endless' && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} style={{ background: 'rgba(220, 38, 38, 0.1)' }}>
+                  <Flame size={18} style={{ color: '#DC2626' }} />
+                </div>
+                <h2 className={styles.sectionTitle}>Endless Challenge</h2>
+              </div>
+              <div style={{ color: 'var(--color-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                Answer questions until you get one wrong. That's the end!
+              </div>
+              <div className={styles.availability} style={{ marginTop: '12px' }}>
+                <span className={styles.availLabel}>Available:</span>
+                <span className={styles.availCount}>{getFilteredQuestions().length} questions</span>
+              </div>
+            </section>
+          )}
         </div>
 
         <div className={styles.sidebar}>

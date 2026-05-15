@@ -11,7 +11,8 @@ import {
   Send,
   LogOut,
   Star,
-  Trash2
+  Trash2,
+  Flame,
 } from 'lucide-react';
 import { Button, Modal } from '../../components/shared';
 import { useQuiz } from '../../context/QuizContext';
@@ -61,6 +62,10 @@ export function Quiz() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [noMoreQuestions, setNoMoreQuestions] = useState(false);
   
   const timerRef = useRef(null);
   const submitFnRef = useRef(null);
@@ -70,6 +75,7 @@ export function Quiz() {
   const isPractice = mode === 'practice';
   const isTimed = mode === 'timed' || mode === 'quiz';
   const isDueMode = mode === 'due';
+  const isEndless = mode === 'endless';
 
   // Navigation Guard
   useEffect(() => {
@@ -127,14 +133,64 @@ export function Quiz() {
     return () => clearInterval(timerRef.current);
   }, [timeLeft]);
 
+  // Game Over - Endless Mode
+  useEffect(() => {
+    if (gameOver && session) {
+      clearInterval(timerRef.current);
+      const correctCount = quizQuestions.reduce((acc, q, idx) => {
+        const answer = answers[idx];
+        const originalIdx = answer !== null ? shuffledOptions[idx][answer] : null;
+        return acc + (originalIdx === q.correct ? 1 : 0);
+      }, 0);
+      
+      const finalSession = {
+        ...session,
+        score: correctCount,
+        total: quizQuestions.length,
+        timeTaken: isTimed && timeLeft !== null ? (userSettings.timerDefault || 30) * session.total - (timeLeft || 0) : 0,
+        answers: answers,
+        shuffledOptions,
+        bestStreak,
+        gameOver: true,
+      };
+      const savedSession = addQuizSession(finalSession);
+      navigate(`/results/${savedSession.id}`);
+    }
+  }, [gameOver, session, quizQuestions, answers, shuffledOptions, isTimed, timeLeft, userSettings.timerDefault, addQuizSession, navigate, bestStreak]);
+
+  // Endless mode - no more questions
+  useEffect(() => {
+    if (isEndless && currentIndex >= quizQuestions.length - 1 && answeredCount > 0 && !gameOver) {
+      setNoMoreQuestions(true);
+      setTimeout(() => {
+        setGameOver(true);
+      }, 500);
+    }
+  }, [isEndless, currentIndex, quizQuestions.length, answeredCount, gameOver]);
+
   const handleNext = useCallback(() => {
+    if (isEndless) {
+      if (currentIndex < quizQuestions.length - 1) {
+        const nextIdx = currentIndex + 1;
+        setCurrentIndex(nextIdx);
+        setShowFeedback(false);
+        setViewedQuestions(prev => ({ ...prev, [nextIdx]: true }));
+      } else {
+        setNoMoreQuestions(true);
+        setTimeout(() => {
+          setGameOver(true);
+        }, 500);
+      }
+      return;
+    }
+    
     if (currentIndex < quizQuestions.length - 1) {
       const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
       setShowFeedback(false);
       setViewedQuestions(prev => ({ ...prev, [nextIdx]: true }));
     }
-  }, [currentIndex, quizQuestions.length]);
+  }, [currentIndex, quizQuestions.length, isEndless]);
 
   const handlePrev = () => {
     if (currentIndex > 0) {
@@ -173,7 +229,7 @@ export function Quiz() {
   };
 
   const handleAnswerSelect = useCallback((optionIndex) => {
-    if (showFeedback && isPractice) return;
+    if (showFeedback && (isPractice || isEndless)) return;
     
     const currentQ = quizQuestions[currentIndex];
     const originalIdx = shuffledOptions[currentIndex][optionIndex];
@@ -192,6 +248,22 @@ export function Quiz() {
       newAnswers[currentIndex] = optionIndex;
       return newAnswers;
     });
+
+    if (isEndless) {
+      setShowFeedback(true);
+      if (isCorrect) {
+        const newStreak = streak + 1;
+        setStreak(newStreak);
+        if (newStreak > bestStreak) {
+          setBestStreak(newStreak);
+        }
+      } else {
+        setTimeout(() => {
+          setGameOver(true);
+        }, 500);
+      }
+      return;
+    }
     
     if (isPractice) {
       setShowFeedback(true);
@@ -203,7 +275,7 @@ export function Quiz() {
         handleNext();
       }, 300);
     }
-  }, [currentIndex, showFeedback, isPractice, handleNext, isDueMode, quizQuestions, isInSpacedRevision, updateSpacedRevision, isWrongQuestion, updateWrongQuestionStreak]);
+  }, [currentIndex, showFeedback, isPractice, isEndless, handleNext, isDueMode, quizQuestions, isInSpacedRevision, updateSpacedRevision, isWrongQuestion, updateWrongQuestionStreak, streak, bestStreak]);
 
   const currentQuestion = quizQuestions[currentIndex];
   const currentAnswer = answers[currentIndex];
@@ -245,14 +317,24 @@ export function Quiz() {
               <span className={styles.modeBadge}>{mode}</span>
               <span className={styles.subjectName}>{session?.subject || 'Quiz Session'}</span>
             </div>
-            <div className={styles.progressContainer}>
-              <div className={styles.progressBar}>
-                <div className={styles.progressFill} style={{ width: `${getProgressPercent()}%` }} />
+            {isEndless ? (
+              <div className={styles.progressContainer}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Flame size={20} style={{ color: streak > 0 ? '#DC2626' : 'var(--color-muted)' }} />
+                  <span style={{ fontWeight: 600, fontSize: '1.125rem' }}>{streak}</span>
+                  <span style={{ color: 'var(--color-muted)', fontSize: '0.75rem' }}>streak</span>
+                </div>
               </div>
-              <span className={styles.progressText}>
-                {currentIndex + 1} / {quizQuestions.length}
-              </span>
-            </div>
+            ) : (
+              <div className={styles.progressContainer}>
+                <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: `${getProgressPercent()}%` }} />
+                </div>
+                <span className={styles.progressText}>
+                  {currentIndex + 1} / {quizQuestions.length}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles.headerRight}>
@@ -395,40 +477,88 @@ export function Quiz() {
       <footer className={styles.bottomBar}>
         <div className={styles.bottomContent}>
           <div className={styles.bottomStats}>
-            <div className={styles.bottomStat}>
-              <span className={styles.bottomStatValue}>{quizQuestions.length}</span>
-              <span className={styles.bottomStatLabel}>Total</span>
-            </div>
-            <div className={styles.bottomStat}>
-              <span className={`${styles.bottomStatValue} ${styles.attempted}`}>{answeredCount}</span>
-              <span className={styles.bottomStatLabel}>Attempted</span>
-            </div>
-            <div className={styles.bottomStat}>
-              <span className={`${styles.bottomStatValue} ${styles.left}`}>{leftCount}</span>
-              <span className={styles.bottomStatLabel}>Left</span>
-            </div>
+            {isEndless ? (
+              <>
+                <div className={styles.bottomStat}>
+                  <span className={styles.bottomStatValue} style={{ color: '#DC2626' }}>{streak}</span>
+                  <span className={styles.bottomStatLabel}>Streak</span>
+                </div>
+                <div className={styles.bottomStat}>
+                  <span className={`${styles.bottomStatValue} ${styles.attempted}`}>{answeredCount}</span>
+                  <span className={styles.bottomStatLabel}>Answered</span>
+                </div>
+                <div className={styles.bottomStat}>
+                  <span className={`${styles.bottomStatValue}`} style={{ color: bestStreak > 0 ? '#8B5CF6' : 'var(--color-muted)' }}>
+                    {bestStreak}
+                  </span>
+                  <span className={styles.bottomStatLabel}>Best</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.bottomStat}>
+                  <span className={styles.bottomStatValue}>{quizQuestions.length}</span>
+                  <span className={styles.bottomStatLabel}>Total</span>
+                </div>
+                <div className={styles.bottomStat}>
+                  <span className={`${styles.bottomStatValue} ${styles.attempted}`}>{answeredCount}</span>
+                  <span className={styles.bottomStatLabel}>Attempted</span>
+                </div>
+                <div className={styles.bottomStat}>
+                  <span className={`${styles.bottomStatValue} ${styles.left}`}>{leftCount}</span>
+                  <span className={styles.bottomStatLabel}>Left</span>
+                </div>
+              </>
+            )}
           </div>
 
           <div className={styles.navActions}>
-            <button
-              className={`${styles.navBtn} ${styles.prevBtn}`}
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-            >
-              <ChevronLeft size={20} />
-              <span>Previous</span>
-            </button>
-            
-            {currentIndex === quizQuestions.length - 1 ? (
-              <button className={`${styles.navBtn} ${styles.submitBtn}`} onClick={() => setShowSubmitModal(true)}>
-                <span>Submit Quiz</span>
-                <Send size={18} />
-              </button>
+            {isEndless ? (
+              <>
+                <button
+                  className={`${styles.navBtn} ${styles.prevBtn}`}
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                >
+                  <ChevronLeft size={20} />
+                  <span>Previous</span>
+                </button>
+                
+                {showFeedback ? (
+                  <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={handleNext}>
+                    <span>Next Question</span>
+                    <ChevronRight size={20} />
+                  </button>
+                ) : (
+                  <button className={`${styles.navBtn} ${styles.submitBtn}`} onClick={() => setShowSubmitModal(true)}>
+                    <span>Finish</span>
+                    <Send size={18} />
+                  </button>
+                )}
+              </>
             ) : (
-              <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={handleNext}>
-                <span>Next Question</span>
-                <ChevronRight size={20} />
-              </button>
+              <>
+                <button
+                  className={`${styles.navBtn} ${styles.prevBtn}`}
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                >
+                  <ChevronLeft size={20} />
+                  <span>Previous</span>
+                </button>
+                
+                {currentIndex === quizQuestions.length - 1 ? (
+                  <button className={`${styles.navBtn} ${styles.submitBtn}`} onClick={() => setShowSubmitModal(true)}>
+                    <span>Submit Quiz</span>
+                    <Send size={18} />
+                  </button>
+                ) : (
+                  <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={handleNext}>
+                    <span>Next Question</span>
+                    <ChevronRight size={20} />
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
